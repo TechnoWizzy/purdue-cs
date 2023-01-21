@@ -1,0 +1,11 @@
+#Directories
+node_modules/
+.idea/
+
+#Extensions
+*.js
+*.map
+*.json
+
+#Files
+.gitattributes
