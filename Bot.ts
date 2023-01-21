@@ -178,9 +178,9 @@ export default class Bot extends Client {
 
 
 
-            return new InteractionStatus(InteractionType.Menu, user, true, null);
+            return new InteractionStatus(InteractionType.Select, user, true, null);
         } catch (error) {
-            return new InteractionStatus(InteractionType.Menu, user, false, error);
+            return new InteractionStatus(InteractionType.Select, user, false, error);
         }
     }
 

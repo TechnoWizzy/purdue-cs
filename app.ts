@@ -2,7 +2,7 @@ import Bot from "./Bot";
 import * as config from "./config.json";
 import * as express from "express";
 import {Interaction} from "discord.js";
-import InteractionStatus from "./InteractionStatus";
+import InteractionStatus, {InteractionType} from "./InteractionStatus";
 import {Router} from "./Router";
 
 export const bot = new Bot();
@@ -22,6 +22,7 @@ bot.on('interactionCreate', (interaction: Interaction) => {
     else if (interaction.isSelectMenu()) status = bot.handleSelectMenu(interaction);
     else if (interaction.isChatInputCommand()) status = bot.handleCommand(interaction);
     else if (interaction.isModalSubmit()) status = bot.handleModalSubmit(interaction);
+    else status = Promise.resolve(new InteractionStatus(InteractionType.Unknown, interaction.user, false, new Error("Unknown Interaction")));
 
     status.then((response) => {
         if (!response.status) {

@@ -1,7 +1,7 @@
 import {Collection, MongoClient} from "mongodb";
 import * as config from "./config.json";
 
-const connectionString = `mongodb://${config.mongo.username}:${config.mongo.password}@technowizzy.dev:27017/?authMechanism=DEFAULT`;
+const connectionString = `mongodb://${config.mongo.username}:${config.mongo.password}@${config.mongo.url}/?authMechanism=DEFAULT`;
 
 export default class Database {
     private _students: Collection;

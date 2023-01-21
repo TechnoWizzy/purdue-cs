@@ -50,7 +50,7 @@ export default class InteractionStatus {
 export enum InteractionType {
     Button="Button",
     Command="Command",
-    Menu="Menu",
+    Select="Select",
     Modal="Modal",
     Unknown="Unknown"
 }
