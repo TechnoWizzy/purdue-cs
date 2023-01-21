@@ -196,7 +196,7 @@ export default class Bot extends Client {
             const username = user.username;
             const hash = Verifier.encrypt(user.id + "-" + Date.now());
             const token = hash.iv + "-" + hash.content;
-            const url = `https://www.technowizzy.dev/api/v1/students/verify/${token}`;
+            const url = `https://${config.url}/api/v1/students/verify/${token}`;
             await new Student(user.id, username, email, 0, false).save();
             await interaction.reply({content: `An email was sent to \`${email}\`.`, ephemeral: true});
             await this.verifier.insert(user, interaction);
