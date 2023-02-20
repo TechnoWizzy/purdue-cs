@@ -1,17 +1,17 @@
 import {
-    ActivityType,
+    ActivityType, AttachmentBuilder,
     ButtonInteraction,
     ChatInputCommandInteraction,
     Client,
     ClientOptions,
-    Collection,
+    Collection, EmbedBuilder,
     Guild,
     GuildMember,
     IntentsBitField,
-    ModalSubmitInteraction,
+    ModalSubmitInteraction, PermissionsBitField,
     REST,
     Role,
-    SelectMenuInteraction,
+    SelectMenuInteraction, StringSelectMenuInteraction,
     TextChannel,
     User
 } from "discord.js";
@@ -30,7 +30,8 @@ const options = {
     intents: [
         IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMembers,
         IntentsBitField.Flags.GuildBans, IntentsBitField.Flags.GuildMessages,
-        IntentsBitField.Flags.DirectMessages, IntentsBitField.Flags.GuildPresences
+        IntentsBitField.Flags.DirectMessages, IntentsBitField.Flags.GuildPresences,
+        IntentsBitField.Flags.GuildMessageReactions, IntentsBitField.Flags.DirectMessageReactions
     ]
 } as ClientOptions;
 
@@ -71,8 +72,9 @@ export default class Bot extends Client {
     }
 
     async init() {
+
         this._guild = await this.guilds.fetch(config.guild.id);
-        this._logger = new Logger(null);
+        this._logger = new Logger(await bot.guild.channels.fetch(config.guild.channels.logs) as TextChannel);
         this._database = new Database();
         this._verifier = new Verifier();
 
@@ -106,7 +108,6 @@ export default class Bot extends Client {
         try {
             await rest.put(Routes.applicationGuildCommands(id, guild.id), {body: guildCommands});
             await rest.put(Routes.applicationCommands(id), {body: globalCommands});
-            await this.logger.info("Application commands uploaded");
         } catch (error) {
             await this.logger.error("Error uploading application commands", error);
         }
@@ -118,9 +119,12 @@ export default class Bot extends Client {
 
         try {
 
-            if (!role) return new InteractionStatus(InteractionType.Button, user, false, new Error("Non-existent role"));
+            if (!role) {
+                await interaction.reply({content: "This is a legacy course/role. You can't have it, sorry!", ephemeral: true});
+                return;
+            }
 
-            const guildMember: GuildMember = await this.guild.members.fetch(user);
+            const member: GuildMember = await this.guild.members.fetch(user);
 
             /*
             if (role.id == config.guild.roles.specialty.verified) {
@@ -128,27 +132,33 @@ export default class Bot extends Client {
                 const student: Student = await Student.get(user.id);
 
                 if (student && student.status) {
-                    await guildMember.roles.add(role.id);
+                    await member.roles.add(role.id);
                     await interaction.reply({content: `You are verified. Thank you!`, ephemeral: true});
                 } else {
                     await interaction.showModal(new PurdueModal());
                 }
             } else {
-                if (guildMember.roles.cache.has(role.id)) {
-                    await guildMember.roles.remove(role.id);
+                if (member.roles.cache.has(role.id)) {
+                    await member.roles.remove(role.id);
                     await interaction.reply({content: `You removed **<@&${role.id}>**.`, ephemeral: true});
                 } else {
-                    await guildMember.roles.add(role.id);
+                    await member.roles.add(role.id);
                     await interaction.reply({content: `You applied **<@&${role.id}>**.`, ephemeral: true});
                 }
             }
              */
 
-            if (guildMember.roles.cache.has(role.id)) {
-                await guildMember.roles.remove(role.id);
+            if (member.roles.cache.has(role.id)) {
+
+                await member.roles.remove(role.id);
                 await interaction.reply({content: `You removed **<@&${role.id}>**.`, ephemeral: true});
             } else {
-                await guildMember.roles.add(role.id);
+                const blacklist = JSON.parse(fs.readFileSync("./blacklist.json").toString());
+                if (blacklist[role.id] != null && blacklist[role.id].includes(member.id)) {
+                    await interaction.reply({content: "I'm sorry, you have been blacklisted from this role, please contact an admin if you believe this is in error.", ephemeral: true});
+                    return;
+                }
+                await member.roles.add(role.id);
                 await interaction.reply({content: `You applied **<@&${role.id}>**.`, ephemeral: true});
             }
 
@@ -171,12 +181,10 @@ export default class Bot extends Client {
         }
     }
 
-    public async handleSelectMenu(interaction: SelectMenuInteraction): Promise<InteractionStatus> {
+    public async handleSelectMenu(interaction: StringSelectMenuInteraction): Promise<InteractionStatus> {
         const user = interaction.user;
 
         try {
-
-
 
             return new InteractionStatus(InteractionType.Select, user, true, null);
         } catch (error) {
@@ -197,7 +205,7 @@ export default class Bot extends Client {
             const hash = Verifier.encrypt(user.id + "-" + Date.now());
             const token = hash.iv + "-" + hash.content;
             const url = `https://${config.url}/api/v1/students/verify/${token}`;
-            await new Student(user.id, username, email, 0, false).save();
+            await new Student(user.id, username, email, false).save();
             await interaction.reply({content: `An email was sent to \`${email}\`.`, ephemeral: true});
             await this.verifier.insert(user, interaction);
             Verifier.sendEmail(email, url);

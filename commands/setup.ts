@@ -17,7 +17,7 @@ import PurdueRow from "../components/Purdue.Row";
 import MiscellaneousComponents from "../components/Miscellaneous.Components";
 import CoreComponents from "../components/Core.Components";
 import UpperComponents from "../components/Upper.Components";
-import SpecialtyRow from "../components/Specialty.Row";
+import SpecialtyComponents from "../components/Specialty.Components";
 
 export = {
     data: new SlashCommandBuilder()
@@ -28,7 +28,7 @@ export = {
             .setDescription("The name of the menu to setup")
             .setRequired(true)
             .setChoices(
-                {name: "verification", value: "verification_menu"},
+                //{name: "verification", value: "verification_menu"},
                 {name: "miscellaneous", value: "miscellaneous_menu"},
                 {name: "core", value: "core_menu"},
                 {name: "upper", value: "upper_menu"},
@@ -50,6 +50,12 @@ export = {
         await interaction.reply({content: "Success", ephemeral: true});
     }
 }
+
+/* ToDo
+function buildBasicMenuOne(): MessageReplyOptions {
+
+}
+ */
 
 function buildVerificationMenu(): MessageReplyOptions {
     const embed = new PurdueEmbed();
@@ -77,8 +83,8 @@ function buildUpperMenu(): MessageReplyOptions {
 
 function buildSpecialtyMenu(): MessageReplyOptions {
     const embed = new SpecialtyEmbed();
-    const row = new SpecialtyRow();
-    return ({embeds: [embed], components: [row]});
+    const row = new SpecialtyComponents();
+    return ({embeds: [embed], components: row});
 }
 
 function buildExampleMenu(user: User): MessageReplyOptions {

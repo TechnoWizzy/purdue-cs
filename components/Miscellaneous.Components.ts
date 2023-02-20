@@ -19,6 +19,10 @@ const rowA = new ActionRowBuilder<ButtonBuilder>()
             .setStyle(ButtonStyle.Secondary)
             .setLabel("CS159"),
         new ButtonBuilder()
+            .setCustomId(config.guild.roles.misc.cs176)
+            .setStyle(ButtonStyle.Secondary)
+            .setLabel("CS176"),
+        new ButtonBuilder()
             .setCustomId(config.guild.roles.misc.cs177)
             .setStyle(ButtonStyle.Secondary)
             .setLabel("CS177"),
@@ -43,7 +47,11 @@ const rowB = new ActionRowBuilder<ButtonBuilder>()
             .setStyle(ButtonStyle.Secondary)
             .setLabel("CS242"),
         new ButtonBuilder()
+            .setCustomId(config.guild.roles.misc.cs290)
+            .setStyle(ButtonStyle.Secondary)
+            .setLabel("CS290"),
+        new ButtonBuilder()
             .setCustomId(config.guild.roles.misc.cs_91)
             .setStyle(ButtonStyle.Secondary)
-            .setLabel("CS_91")
+            .setLabel("Seminars")
     );

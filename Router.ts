@@ -11,6 +11,8 @@ Router.use(express.json());
 Router.get("/activate/:id", async (req: Request, res: Response) => {
     const id = req?.params?.id;
     const member = await bot.guild.members.fetch(id);
+    res.status(201);
+    /*
     if (member && !member.roles.cache.has(config.guild.roles.specialty.verified)) {
         await member.roles.add(config.guild.roles.specialty.verified);
         const entry = bot.verifier.get(member.id);
@@ -26,4 +28,6 @@ Router.get("/activate/:id", async (req: Request, res: Response) => {
     } else {
         res.status(201);
     }
+
+     */
 })

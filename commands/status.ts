@@ -7,11 +7,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("status")
         .setDescription("Sets the Bot activity status")
-        .addStringOption(option => option
-            .setName("activity_name")
-            .setDescription("The name of the activity")
-            .setRequired(true)
-        )
+
         .addStringOption(option => option
             .setName("activity_type")
             .setDescription("The type of activity")
@@ -23,6 +19,12 @@ module.exports = {
                 {name: "watching", value: "WATCHING"},
                 {name: "streaming", value: "STREAMING"},
             )
+        )
+
+        .addStringOption(option => option
+            .setName("activity_name")
+            .setDescription("The name of the activity")
+            .setRequired(true)
         )
     ,
 

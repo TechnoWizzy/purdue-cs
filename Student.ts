@@ -5,20 +5,18 @@ export default class Student {
     private _id: string;
     private _username: string;
     private _email: string;
-    private _code: number;
     private _status: boolean;
 
-    constructor(id: string, username: string, email: string, code: number, status: boolean) {
+    constructor(id: string, username: string, email: string, status: boolean) {
         this._id = id;
         this._username = username;
         this._email = email;
-        this._code = code;
         this._status = status;
     }
 
     static fromObject(object) {
         if (object == null) return null;
-        return new Student(object._id, object._username, object._email, object._code, object._status);
+        return new Student(object._id, object._username, object._email, object._status);
     }
 
     get id(): string {
@@ -43,14 +41,6 @@ export default class Student {
 
     set email(value: string) {
         this._email = value;
-    }
-
-    get code(): number {
-        return this._code;
-    }
-
-    set code(value: number) {
-        this._code = value;
     }
 
     get status(): boolean {
