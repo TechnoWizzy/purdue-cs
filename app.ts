@@ -1,22 +1,24 @@
 import Bot from "./Bot";
 import * as config from "./config.json";
+import * as Snoowrap from 'snoowrap';
 import * as express from "express";
 import {
-    ActionRowBuilder,
-    AttachmentBuilder,
-    Embed, EmbedBuilder,
+    User,
     Events,
-    Interaction,
     Message,
-    MessageInteraction,
+    Interaction,
     MessageReaction,
-    TextChannel,
-    User
+    MessageInteraction,
+    PermissionsBitField,
 } from "discord.js";
 import InteractionStatus, {InteractionType} from "./InteractionStatus";
 import {Router} from "./Router";
+import {RedditUser} from "snoowrap";
+import Reddit from "./Reddit";
+import RedditEmbed from "./embeds/Reddit.Embed";
 
 export const bot = new Bot();
+//const reddit = new Reddit();
 
 bot.login(config.token).then(async () => {
     await bot.init().catch();
@@ -24,7 +26,7 @@ bot.login(config.token).then(async () => {
     app.use("/", Router);
     app.listen(4248, () => {
         console.info(`Server started at http://localhost:4248`)
-    })
+    });
 })
 
 bot.on(Events.ClientReady, async () => {
@@ -53,28 +55,47 @@ bot.on(Events.InteractionCreate, (interaction: Interaction) => {
     }).catch();
 });
 
-bot.on(Events.MessageCreate, async (message: Message) => {
-    if (message.author.id != config.users.bruv) return;
-    if (Math.random() > 0.01) return;
-    const user = await bot.guild.members.fetch("751910711218667562");
-    await user.createDM();
-    await user.dmChannel.send({content: config.messages.one});
-    await message.delete();
-})
+bot.on(Events.MessageCreate, (message: Message) => {
+
+    if (!message.inGuild())  return;
+
+
+    if (message.member.permissions.has(PermissionsBitField.Flags.Administrator) || message.reference) {
+        return;
+    }
+
+    const mentions = message.mentions;
+
+    for (const [id,] of mentions.users) {
+        if (id == config.users.bruv) {
+            setTimeout(() => {
+                message.delete().catch();
+            }, 1000)
+        }
+    }
+});
 
 bot.on(Events.MessageReactionAdd, async (reaction: MessageReaction, user: User) => {
 
     const message: Message = reaction.message as Message;
 
-    if (message.author.id != "134073775925886976" || user.bot) {
-        return;
+    if (message.author.id == config.users.bruv && reaction.emoji.name == '🗑') {
+        if (reaction.count > 5) {
+            await message.delete();
+        }
+    } else if (message.author.id == "134073775925886976") {
+        const interaction: MessageInteraction = await message.interaction;
+        const member = await bot.guild.members.fetch(user.id);
+
+        if ((!interaction || interaction.user.id != member.id) && (!member.permissions.has(PermissionsBitField.Flags.ViewAuditLog) || user.bot)) {
+            return;
+        }
+
+        await message.delete();
     }
-
-    const interaction: MessageInteraction = await message.interaction;
-
-    if (!interaction || interaction.user.id != user.id) {
-        return;
-    }
-
-    await message.delete();
 })
+
+//async function runReddit() {
+//    reddit.parse().catch();
+//    setInterval(runReddit, 3600000);
+//}

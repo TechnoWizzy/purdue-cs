@@ -12,14 +12,15 @@ module.exports = {
     global: true,
 
     async execute(interaction: CommandInteraction): Promise<void> {
-        exec("pm2 restart CompSci", (error, stdout, stderr) => {
+        await interaction.reply({content: "Reloading.. Please wait 5 seconds.", ephemeral: true});
+        exec("pm2 restart --restart-delay 5000 CSPurdue ", async (error, stdout, stderr) => {
             if (error) {
-                throw error;
+                throw new Error(error.message);
             }
             if (stderr) {
                 throw new Error(stderr);
             }
-           interaction.reply({content: "Reloading.. Please wait 5 seconds.", ephemeral: true});
+            return;
         });
     }
 }

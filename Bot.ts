@@ -31,7 +31,8 @@ const options = {
         IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMembers,
         IntentsBitField.Flags.GuildBans, IntentsBitField.Flags.GuildMessages,
         IntentsBitField.Flags.DirectMessages, IntentsBitField.Flags.GuildPresences,
-        IntentsBitField.Flags.GuildMessageReactions, IntentsBitField.Flags.DirectMessageReactions
+        IntentsBitField.Flags.GuildMessageReactions, IntentsBitField.Flags.DirectMessageReactions,
+        IntentsBitField.Flags.MessageContent
     ]
 } as ClientOptions;
 
@@ -160,6 +161,9 @@ export default class Bot extends Client {
                 }
                 await member.roles.add(role.id);
                 await interaction.reply({content: `You applied **<@&${role.id}>**.`, ephemeral: true});
+                if (role.id == config.guild.roles.specialty.ta) {
+                    await interaction.followUp({content: "This role is for UTAs and GTAs. Please de-equip if it if you are not a UTA or GTA.", ephemeral: true})
+                }
             }
 
             return new InteractionStatus(InteractionType.Button, user, true, null);
